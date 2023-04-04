@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta name="robots" content="noindex, nofollow"/>
+    <meta name="googlebot" content="noindex, nofollow"/>
+    <title>todo list - JSRUN 驱动</title>
+
+    <script type="text/javascript" src="" ></script>
+    <link rel="stylesheet" type="text/css" href="main.css"/>
+
+</head>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Todo List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* 基本样式 */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    /* 输入框和添加按钮 */
+    .add-todo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .add-todo input[type=text] {
+      flex-grow: 1;
+      margin-right: 10px;
+      padding: 10px;
+      border-radius: 3px;
+      border: none;
+      font-size: 16px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .add-todo button {
+      background-color: #3C3C3C;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 16px;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .add-todo button:hover {
+      background-color: #444;
+    }
+
+    /* 分类按钮 */
+    .category-btns {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .category-btn {
+      background-color: #3C3C3C;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 16px;
+      transition: background-color 0.2s ease-in-out;
+      margin-right: 10px;
+    }
+
+    .category-btn.active {
+      background-color: #444;
+    }
+
+    /* 任务卡片 */
+    .todo-card {
+      background-color: #fff;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0
+
+, 0.1);
+border-radius: 5px;
+padding: 20px;
+margin-bottom: 20px;
+}
+.todo-card.completed {
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.todo-card .title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.todo-card .category {
+  font-size: 12px;
+  margin-bottom: 10px;
+  color: #888;
+}
+
+/* 不同分类的样式 */
+.category-work .todo-card {
+  border-left: 5px solid #1abc9c;
+}
+
+.category-study .todo-card {
+  border-left: 5px solid #3498db;
+}
+
+.category-shopping .todo-card {
+  border-left: 5px solid #f1c40f;
+}
+
+/* 响应式布局 */
+@media screen and (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .add-todo {
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .add-todo input[type=text] {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .category-btns {
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .category-btn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Todo List</h1>
+    <!-- 输入框和添加按钮 -->
+<div class="add-todo">
+  <input type="text" id="todo-input" placeholder="Add a new todo">
+  <button id="add-btn">Add</button>
+</div>
+
+<!-- 分类按钮 -->
+<div class="category-btns">
+  <button class="category-btn active" data-category="all">All</button>
+  <button class="category-btn" data-category="work">Work</button>
+  <button class="category-btn" data-category="study">Study</button>
+  <button class="category-btn" data-category="shopping">Shopping</button>
+</div>
+
+<!-- 任务列表 -->
+<div class="todo-list">
+</div>
+</div>
+  <script>
+    const todoInput = document.getElementById("todo-input");
+    const addBtn = document.getElementById("add-btn");
+    const todoList = document.querySelector(".todo-list");
+    const categoryBtns = document.querySelectorAll(".category-btn");
+
+    // 保存任务列表
+    let todos = [];
+
+    // 添加任务
+    function addTodo() {
+      const todoText = todoInput.value.trim();
+
+      if (!todoText) {
+        return;
+      }
+
+      const todo = {
+        id: Date.now(),
+        text: todoText,
+        completed: false,
+        category: "all"
+      };
+
+      todos.push(todo);
+      renderTodos();
+      todoInput.value = "";
+    }
+
+    // 删除任务
+    function deleteTodoById(id) {
+      todos = todos.filter(todo => todo.id !== id);
+      renderTodos();
+    }
+
+    // 切换完成状态
+    function toggleTodoComplete(id) {
+      const todo = todos.find(todo => todo.id === id);
+      todo.completed = !todo.completed;
+      renderTodos();
+    }
+
+    // 渲染任务列表
+    function renderTodos(category = "all") {
+      // 根据分类筛选任务
+      const filteredTodos = todos.filter(todo => category === "all" || todo.category === category);
+
+      todoList.innerHTML = "";
+
+      filteredTodos.forEach(todo => {
+        const todoCard = document.createElement("div");
+        todoCard.classList.add("todo-card");
+        todoCard.classList.toggle("completed", todo.completed);
+
+        const title = document.createElement("div");
+        title.classList.add("title");
+        title.textContent = todo.text;
+
+        const category = document.createElement("div");
+        category.classList.add("category");
+        category.textContent = todo.category;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => deleteTodoById(todo.id));
+
+        const completeBtn = document.createElement("button");
+        completeBtn.textContent = todo.completed ? "Undo" : "Complete";
+        completeBtn.addEventListener("click", () => toggleTodoComplete(todo.id));
+
+        todoCard.appendChild(title);
+        todoCard.appendChild(category);
+        todoCard.appendChild(deleteBtn);
+        todoCard.appendChild(completeBtn);
+
+        todoList.appendChild(todoCard);
+      });
+    }
+
+    // 添加任务按钮点击事件
+    addBtn.addEventListener("click", addTodo);
+
+    // 分类按钮点击事件
+    categoryBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        categoryBtns.forEach(btn => btn.classList.remove("active"));
+        btn.classList.add("active");
+        const category = btn.dataset.category;
+        renderTodos(category);
+      });
+    });
+  </script>
+</body>
+
+<script type="application/javascript" src="main.js"></script>
+</html>
+
