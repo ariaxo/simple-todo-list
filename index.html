@@ -269,6 +269,45 @@ margin-bottom: 20px;
         renderTodos(category);
       });
     });
+      
+      // 从 localStorage 中获取之前存储的待办事项
+const items = JSON.parse(localStorage.getItem('todos')) || [];
+
+// 将输入的待办事项添加到列表中，并保存到 localStorage 中
+function addTodo() {
+  const input = document.querySelector('.add-todo input[type="text"]');
+  if (input.value.trim() !== '') {
+    const todo = {
+      content: input.value.trim(),
+      completed: false
+    };
+    // 遍历之前存储的待办事项，判断新的待办事项是否已存在
+    if (!todos.some(item => item.content === todo.content)) {
+      todos.push(todo);
+      input.value = '';
+      renderTodos();
+      saveTodos();
+    } else {
+      alert('该待办事项已存在！');
+    }
+  }
+}
+
+// 保存待办事项到 localStorage 中
+function saveTodos() {
+  localStorage.setItem(' items', JSON.stringify(items));
+}
+
+      // 从 localStorage 中获取之前存储的待办事项，并渲染到页面上
+function loadTodos() {
+  const items = JSON.parse(localStorage.getItem('items')) || [];
+  todos.forEach(todo => {
+    renderTodoItem(todo);
+  });
+}
+
+loadTodos();
+
   </script>
 </body>
 
